@@ -18,11 +18,11 @@ jobs:
           java-version: '21'
 
       - name: Build Order Service JAR
-        working-directory: ./Backend/Services/order-service
+        working-directory: Backend/Services/order-service
         run: ./gradlew clean build
 
       - name: Build Delivery Service JAR
-        working-directory: ./Backend/Services/delivery-service
+        working-directory: Backend/Services/delivery-service
         run: ./gradlew clean build
 
       - name: Set up Docker
@@ -35,13 +35,13 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push Order Service image
-        working-directory: ./Backend/Services
+        working-directory: Backend/Services
         run: |
-          docker build -t docker.io/494690/order-service:latest ./order-service
+          docker build -t docker.io/494690/order-service:latest order-service
           docker push docker.io/494690/order-service:latest
 
       - name: Build and push Delivery Service image
-        working-directory: ./Backend/Services
+        working-directory: Backend/Services
         run: |
-          docker build -t docker.io/494690/delivery-service:latest ./delivery-service
+          docker build -t docker.io/494690/delivery-service:latest delivery-service
           docker push docker.io/494690/delivery-service:latest
