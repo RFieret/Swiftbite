@@ -1,0 +1,33 @@
+# Java
+*.class
+*.log
+*.jar
+*.war
+*.ear
+
+# Build artifacts & libs
+build/
+.gradle/
+lib/
+!gradle/wrapper/gradle-wrapper.jar
+
+# IDEs / Editors
+.idea/
+*.iml
+.vscode/
+*.swp
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Docker / CI/CD
+.env
+docker-compose.override.yml
+
+# GitHub Actions secrets (if any)
+.github/workflows/*.secrets.yml
+
+# Temporary files
+*.bak
+*.tmp

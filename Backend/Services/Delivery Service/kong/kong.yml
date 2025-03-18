@@ -1,8 +1,0 @@
-services:
-  - name: springboot-service
-    url: http://host.docker.internal:8081
-    routes:
-      - name: springboot-route
-        paths:
-          - /api/deliveryService
-        strip_path: false

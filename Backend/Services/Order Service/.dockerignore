@@ -1,0 +1,19 @@
+# Ignore local files and folders that shouldn't be in Docker context
+.git
+.gitignore
+README.md
+docker-compose.yml
+docker-compose.override.yml
+*.log
+*.tmp
+*.bak
+
+# Gradle build artifacts
+build/
+.gradle/
+
+# IDE / OS files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
