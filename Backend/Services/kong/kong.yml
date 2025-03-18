@@ -1,0 +1,15 @@
+_format_version: "3.0"
+services:
+  - name: order-service
+    url: http://order-service:8082
+    routes:
+      - name: order-route
+        paths:
+          - /orders
+
+  - name: delivery-service
+    url: http://delivery-service:8081
+    routes:
+      - name: delivery-route
+        paths:
+          - /deliveries
