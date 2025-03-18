@@ -17,13 +17,23 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
+      - name: Make gradlew executable (Order Service)
+        working-directory: "Backend/Services/Order Service"
+        run: chmod +x ./gradlew
+
       - name: Build Order Service JAR
         working-directory: "Backend/Services/Order Service"
         run: ./gradlew clean build
 
+
+      - name: Make gradlew executable (Delivery Service)
+        working-directory: "Backend/Services/Delivery Service"
+        run: chmod +x ./gradlew
+
       - name: Build Delivery Service JAR
         working-directory: "Backend/Services/Delivery Service"
         run: ./gradlew clean build
+
 
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
