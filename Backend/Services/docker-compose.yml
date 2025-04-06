@@ -56,7 +56,8 @@ services:
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8082/actuator/health" ]
       interval: 30s
@@ -102,6 +103,33 @@ services:
       - "8001:8001"
     volumes:
       - ./kong/kong.yml:/kong/declarative/kong.yml
+    networks:
+      - kong-net
+
+  test-runner:
+    build:
+      context: './Order Service'
+    entrypoint: ""
+    command: >
+      sh -c "
+        echo '⏳ Waiting for Kong...' &&
+        sleep 20 &&
+        chmod +x ./gradlew &&
+        ./gradlew test --tests *OrderDeliveryE2ETest
+      "
+    environment:
+      BASE_URL: http://kong:8000
+    depends_on:
+      kong:
+        condition: service_healthy
+      order-service:
+        condition: service_healthy
+      delivery-service:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    volumes:
+      - ./build-reports:/app/build/reports
     networks:
       - kong-net
 

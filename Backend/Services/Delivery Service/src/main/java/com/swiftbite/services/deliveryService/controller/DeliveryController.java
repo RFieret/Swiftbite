@@ -48,4 +48,14 @@ public class DeliveryController {
         messageController.sendCompleteOrderMessage(deliveryID, orderID);
         return ResponseEntity.ok("Message sent to RabbitMQ");
     }
+
+    @GetMapping("/delivery-by-order/{orderId}")
+    public ResponseEntity<Delivery> getDeliveryByOrderId(@PathVariable String orderId) {
+        Delivery delivery = deliveryService.getDeliveryByOrderId(orderId);
+        if (delivery != null) {
+            return ResponseEntity.ok(delivery);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

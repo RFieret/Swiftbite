@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -38,5 +39,9 @@ public class DeliveryService {
         deliveryRepository.save(delivery);
 
         return delivery.getOrderId();
+    }
+
+    public Delivery getDeliveryByOrderId(String orderId) {
+        return deliveryRepository.findByOrderId(orderId).orElse(null);
     }
 }
