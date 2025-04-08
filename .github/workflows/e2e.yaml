@@ -27,8 +27,8 @@ jobs:
       - name: Start application with Docker Compose
         run: docker compose -f ./Backend/Services/docker-compose.yml up -d --build
 
-#      - name: Wait for services to start
-#        run: sleep 30
+      - name: Wait for services to start
+        run: sleep 15
 
       - name: Step 1 - Create delivery
         run: |
