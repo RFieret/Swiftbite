@@ -18,6 +18,6 @@ public class DeliveryCompletedTest {
     void deliveryShouldBeCompleted() {
         Delivery delivery = deliveryRepository.findByOrderId("1");
         assertNotNull(delivery, "Delivery should not be null");
-        assertEquals("completed", delivery.getStatus());
+        assertEquals("Completed", delivery.getStatus());
     }
 }
