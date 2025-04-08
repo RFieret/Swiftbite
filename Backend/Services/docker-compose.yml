@@ -65,30 +65,11 @@ services:
     networks:
       - kong-net
 
-  delivery-service-1:
+  delivery-service:
     build:
       context: './Delivery Service'
-    expose:
-      - "8081"
-    environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_DATA_MONGODB_URI: mongodb://root:root@mongodb:27017/deliverydb?authSource=admin
-    depends_on:
-      - rabbitmq
-      - mongodb
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-    networks:
-      - kong-net
-
-  delivery-service-2:
-    build:
-      context: './Delivery Service'
-    expose:
-      - "8081"
+    ports:
+      - "8081:8081"
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
       SPRING_DATA_MONGODB_URI: mongodb://root:root@mongodb:27017/deliverydb?authSource=admin
@@ -107,8 +88,7 @@ services:
     image: kong:3.5
     depends_on:
       - order-service
-      - delivery-service-1
-      - delivery-service-2
+      - delivery-service
     environment:
       KONG_DATABASE: off
       KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yml

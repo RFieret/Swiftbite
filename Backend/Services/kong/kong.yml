@@ -3,8 +3,7 @@ _format_version: "3.0"
 upstreams:
   - name: delivery-service
     targets:
-      - target: delivery-service-1:8081
-      - target: delivery-service-2:8081
+      - target: delivery-service:8081
 
 services:
   - name: order-service
