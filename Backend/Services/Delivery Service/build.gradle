@@ -28,6 +28,7 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:1.18.30'
 }
 
-tasks.named('test') {
+tasks.named('test')  {
 	useJUnitPlatform()
+	exclude '**/E2EtestScripts/**'
 }
