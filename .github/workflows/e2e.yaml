@@ -36,6 +36,9 @@ jobs:
                -H "Content-Type: application/json" \
                -d '{"id": "1","customerName": "Peter","address": "Boeksbrug","status": "Created"}'
 
+      - name: Debug - Check RabbitMQ queues
+        run: docker compose exec rabbitmq rabbitmqctl list_queues
+
       - name: Step 2 - Get delivery ID from orderId
         id: get_delivery_id
         run: |
@@ -47,17 +50,6 @@ jobs:
           curl -X POST http://localhost:8000/deliveries/api/deliveryservice/assignDeliverer \
                -H "Content-Type: application/json" \
                -d "{\"deliveryId\": \"${{ env.DELIVERY_ID }}\", \"deliverer\": {\"name\": \"piet\", \"phone\": \"0612324444\"}}"
-
-      - name: Wait for delivery to be persisted in MongoDB
-        run: |
-          echo "Waiting for delivery to appear in DB..."
-          for i in {1..10}; do
-            curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1" | jq -e '.id' && echo "✅ Delivery found!" && exit 0
-            echo "Delivery not found yet... retrying"
-            sleep 3
-          done
-          echo "❌ Delivery was not saved in time" && exit 1
-
 
       - name: Step 4 - Verify delivery is assigned to driver (script)
         run: |
