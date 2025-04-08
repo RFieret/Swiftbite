@@ -73,7 +73,7 @@ jobs:
 
       - name: Step 8 - Check OrderService received message
         run: |
-          docker compose -f ./Backend/Services/docker-compose.yml logs orderservice > orderservice.log
+          docker compose -f ./Backend/Services/docker-compose.yml logs order-service > orderservice.log
           grep "Received delivery complete for order: 1" orderservice.log
 
       - name: Cleanup
