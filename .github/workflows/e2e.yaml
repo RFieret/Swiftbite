@@ -77,7 +77,7 @@ jobs:
         run: |
           cd Backend/Services/Delivery\ Service
           chmod +x ./gradlew
-          ./gradlew e2eTest -Dspring.profiles.active=test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DeliveryCompletedTest"
+          ./gradlew e2eTest -Dspring.profiles.active=test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DeliveryCreatedTest"
 
       - name: Step 8 - Check OrderService received message
         run: |
