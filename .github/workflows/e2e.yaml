@@ -48,15 +48,15 @@ jobs:
                -H "Content-Type: application/json" \
                -d "{\"deliveryId\": \"${{ env.DELIVERY_ID }}\", \"deliverer\": {\"name\": \"piet\", \"phone\": \"0612324444\"}}"
 
-      - name: Wait for MongoDB
+      - name: Wait for delivery to be persisted in MongoDB
         run: |
-          echo "Waiting for MongoDB to be available..."
+          echo "Waiting for delivery to appear in DB..."
           for i in {1..10}; do
-            nc -z localhost 27017 && echo "Mongo is up!" && exit 0
-            echo "Still waiting for Mongo..."
+            curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1" | jq -e '.id' && echo "✅ Delivery found!" && exit 0
+            echo "Delivery not found yet... retrying"
             sleep 3
           done
-          echo "Mongo did not start in time." && exit 1
+          echo "❌ Delivery was not saved in time" && exit 1
 
 
       - name: Step 4 - Verify delivery is assigned to driver (script)
