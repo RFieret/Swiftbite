@@ -32,12 +32,12 @@ jobs:
 
       - name: Step 1 - Create delivery
         run: |
-          curl -X POST http://localhost:8000/orders/api/orderService/createDelivery \
+          curl -i -X POST http://localhost:8000/orders/api/orderService/createDelivery \
                -H "Content-Type: application/json" \
                -d '{"id": "1","customerName": "Peter","address": "Boeksbrug","status": "Created"}'
 
       - name: Debug - Check RabbitMQ queues
-        run: docker compose exec rabbitmq rabbitmqctl list_queues
+        run: docker compose -f ./Backend/Services/docker-compose.yml exec rabbitmq rabbitmqctl list_queues
 
       - name: Step 2 - Get delivery ID from orderId
         id: get_delivery_id
