@@ -63,7 +63,7 @@ jobs:
         run: |
           cd Backend/Services/Delivery\ Service
           chmod +x ./gradlew
-          ./gradlew e2eTest --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DelivererAssignedTest" -Dspring.profiles.active=test
+          ./gradlew e2eTest -Dspring.profiles.active=test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DelivererAssignedTest"
 
 
       - name: Step 5 - Complete the delivery
@@ -74,7 +74,7 @@ jobs:
         run: |
           cd Backend/Services/Delivery\ Service
           chmod +x ./gradlew
-          ./gradlew e2eTest --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DeliveryCompletedTest" -Dspring.profiles.active=test
+          ./gradlew e2eTest -Dspring.profiles.active=test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DeliveryCompletedTest"
 
       - name: Step 7 - Check OrderService received message
         run: |
