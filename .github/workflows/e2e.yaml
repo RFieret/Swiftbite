@@ -45,16 +45,15 @@ jobs:
           chmod +x ./gradlew
           ./gradlew e2eTest -Dspring.profiles.active=test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DeliveryCreatedTest"
 
-      - name: Debug - Check deliveryByOrder response
-        run: |
-          echo "🔍 Checking deliveryByOrder response..."
-          curl -s "http://localhost:8081/api/deliveryservice/deliveryByOrder/1"
-
       - name: Step 3 - Get delivery ID from orderId
         id: get_delivery_id
         run: |
           DELIVERY_ID=$(curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1" | jq -r '.id')
           echo "DELIVERY_ID=$DELIVERY_ID" >> $GITHUB_ENV
+
+      - name: Debug - Print deliveryService logs
+        run: |
+          docker compose -f ./Backend/Services/docker-compose.yml logs deliveryservice 
 
       - name: Debug - Print DELIVERY_ID
         run: |
