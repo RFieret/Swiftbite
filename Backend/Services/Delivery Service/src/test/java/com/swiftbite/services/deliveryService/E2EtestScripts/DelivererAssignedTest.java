@@ -15,8 +15,8 @@ public class DelivererAssignedTest {
 
     @Test
     void deliveryShouldHaveDriverAssigned() {
-        var delivery = deliveryRepository.findByOrderId("123");
+        var delivery = deliveryRepository.findByOrderId("1");
         assertNotNull(delivery, "Delivery should not be null");
-        assertEquals("driver42", delivery.getDeliverer().getName());
+        assertEquals("piet", delivery.getDeliverer().getName());
     }
 }
