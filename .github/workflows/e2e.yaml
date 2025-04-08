@@ -45,26 +45,21 @@ jobs:
           chmod +x ./gradlew
           ./gradlew e2eTest -Dspring.profiles.active=test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DeliveryCreatedTest"
 
+      - name: Debug - Check deliveryByOrder response
+        run: |
+          echo "🔍 Checking deliveryByOrder response..."
+          curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1"
+
       - name: Step 3 - Get delivery ID from orderId
         id: get_delivery_id
         run: |
-          echo "Waiting for delivery to exist..."
-          for i in {1..10}; do
-            DELIVERY_ID=$(curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1" | jq -r '.id')
-            if [ "$DELIVERY_ID" != "null" ]; then
-              echo "✅ Delivery found: $DELIVERY_ID"
-              echo "delivery_id=$DELIVERY_ID" >> $GITHUB_OUTPUT
-              exit 0
-            fi
-            echo "Still waiting for delivery..."
-            sleep 3
-          done
-          echo "❌ Delivery not found in time"
-          exit 1
+          DELIVERY_ID=$(curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1" | jq -r '.id')
+          echo "DELIVERY_ID=$DELIVERY_ID" >> $GITHUB_ENV
 
       - name: Debug - Print DELIVERY_ID
         run: |
-          echo "DELIVERY_ID is: ${{ steps.get_delivery_id.outputs.delivery_id }}"
+          echo "DELIVERY_ID is: ${{ env.DELIVERY_ID }}"
+
 
       - name: Step 4 - Assign driver to delivery
         run: |
