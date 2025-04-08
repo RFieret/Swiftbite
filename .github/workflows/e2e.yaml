@@ -65,6 +65,10 @@ jobs:
         run: |
           curl -X POST http://localhost:8000/deliveries/api/deliveryservice/completeDelivery/${{ env.DELIVERY_ID }}
 
+      - name: 🔍 Debug - Print delivery status before test
+        run: |
+          curl http://localhost:8081/api/deliveryservice/deliveryByOrder/1 | jq
+
       - name: Step 7 - Validate delivery is marked as complete (script)
         run: |
           cd Backend/Services/Delivery\ Service
