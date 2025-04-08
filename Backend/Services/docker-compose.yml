@@ -22,9 +22,9 @@ services:
       - "27017:27017"
     volumes:
       - mongo-data:/data/db
-#    environment:
-#      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
-#      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
     healthcheck:
       test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
@@ -72,6 +72,7 @@ services:
       - "8081:8081"
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_DATA_MONGODB_URI: mongodb://root:root@mongodb:27017/deliverydb?authSource=admin
     depends_on:
       - rabbitmq
       - mongodb
