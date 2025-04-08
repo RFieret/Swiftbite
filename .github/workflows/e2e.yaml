@@ -39,12 +39,12 @@ jobs:
       - name: Step 2 - Get delivery ID from orderId
         id: get_delivery_id
         run: |
-          DELIVERY_ID=$(curl -s "http://localhost:8000/api/deliveryservice/deliveryByOrder/1" | jq -r '.id')
+          DELIVERY_ID=$(curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1" | jq -r '.id')
           echo "DELIVERY_ID=$DELIVERY_ID" >> $GITHUB_ENV
 
       - name: Step 3 - Assign driver to delivery
         run: |
-          curl -X POST http://localhost:8000/api/deliveryservice/assignDeliverer \
+          curl -X POST http://localhost:8000/deliveries/api/deliveryservice/assignDeliverer \
                -H "Content-Type: application/json" \
                -d "{\"deliveryId\": \"${{ env.DELIVERY_ID }}\", \"deliverer\": {\"name\": \"piet\", \"phone\": \"0612324444\"}}"
 
@@ -68,7 +68,7 @@ jobs:
 
       - name: Step 5 - Complete the delivery
         run: |
-          curl -X POST http://localhost:8000/api/deliveryservice/completeDelivery/${{ env.DELIVERY_ID }}
+          curl -X POST http://localhost:8000/deliveries/api/deliveryservice/completeDelivery/${{ env.DELIVERY_ID }}
 
       - name: Step 6 - Validate delivery is marked as complete (script)
         run: |
