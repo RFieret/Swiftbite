@@ -51,6 +51,7 @@ jobs:
       - name: Step 4 - Verify delivery is assigned to driver (script)
         run: |
           cd Backend/Services/Delivery\ Service
+          chmod +x ./gradlew
           ./gradlew test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DelivererAssignedTest"
 
 
@@ -61,6 +62,7 @@ jobs:
       - name: Step 6 - Validate delivery is marked as complete (script)
         run: |
           cd Backend/Services/Delivery\ Service
+          chmod +x ./gradlew
           ./gradlew test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DeliveryCompletedTest"
 
       - name: Step 7 - Check OrderService received message
