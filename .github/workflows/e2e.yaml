@@ -39,7 +39,13 @@ jobs:
       - name: Debug - Check RabbitMQ queues
         run: docker compose -f ./Backend/Services/docker-compose.yml exec rabbitmq rabbitmqctl list_queues
 
-      - name: Step 2 - Get delivery ID from orderId
+      - name: Step 2 - Verify delivery is created (script)
+        run: |
+          cd Backend/Services/Delivery\ Service
+          chmod +x ./gradlew
+          ./gradlew e2eTest -Dspring.profiles.active=test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DelivererCreatedTest"
+
+      - name: Step 3 - Get delivery ID from orderId
         id: get_delivery_id
         run: |
           DELIVERY_ID=$(curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1" | jq -r '.id')
@@ -50,30 +56,30 @@ jobs:
           echo "DELIVERY_ID is: ${{ env.DELIVERY_ID }}"
 
 
-      - name: Step 3 - Assign driver to delivery
+      - name: Step 4 - Assign driver to delivery
         run: |
           curl -X POST http://localhost:8000/deliveries/api/deliveryservice/assignDeliverer \
                -H "Content-Type: application/json" \
                -d '{"deliveryId": "${{ env.DELIVERY_ID }}", "deliverer": {"name": "piet", "phone": "0612324444"}}'
 
-      - name: Step 4 - Verify delivery is assigned to driver (script)
+      - name: Step 5 - Verify delivery is assigned to driver (script)
         run: |
           cd Backend/Services/Delivery\ Service
           chmod +x ./gradlew
           ./gradlew e2eTest -Dspring.profiles.active=test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DelivererAssignedTest"
 
 
-      - name: Step 5 - Complete the delivery
+      - name: Step 6 - Complete the delivery
         run: |
           curl -X POST http://localhost:8000/deliveries/api/deliveryservice/completeDelivery/${{ env.DELIVERY_ID }}
 
-      - name: Step 6 - Validate delivery is marked as complete (script)
+      - name: Step 7 - Validate delivery is marked as complete (script)
         run: |
           cd Backend/Services/Delivery\ Service
           chmod +x ./gradlew
           ./gradlew e2eTest -Dspring.profiles.active=test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DeliveryCompletedTest"
 
-      - name: Step 7 - Check OrderService received message
+      - name: Step 8 - Check OrderService received message
         run: |
           docker compose logs orderservice > orderservice.log
           grep "Received delivery complete for order: 1" orderservice.log
