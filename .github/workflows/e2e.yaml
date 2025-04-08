@@ -49,12 +49,11 @@ jobs:
         id: get_delivery_id
         run: |
           DELIVERY_ID=$(curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1" | jq -r '.id')
-          echo "DELIVERY_ID=$DELIVERY_ID" >> $GITHUB_ENV
+          echo "delivery_id=$DELIVERY_ID" >> $GITHUB_OUTPUT
 
       - name: Debug - Print DELIVERY_ID
         run: |
-          echo "DELIVERY_ID is: ${{ env.DELIVERY_ID }}"
-
+          echo "DELIVERY_ID is: ${{ steps.get_delivery_id.outputs.delivery_id }}"
 
       - name: Step 4 - Assign driver to delivery
         run: |
