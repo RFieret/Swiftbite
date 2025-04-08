@@ -51,9 +51,9 @@ jobs:
           DELIVERY_ID=$(curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1" | jq -r '.id')
           echo "DELIVERY_ID=$DELIVERY_ID" >> $GITHUB_ENV
 
-      - name: Debug - Print deliveryService logs
+      - name: Debug - Print delivery-Service logs
         run: |
-          docker compose -f ./Backend/Services/docker-compose.yml logs deliveryservice 
+          docker compose -f ./Backend/Services/docker-compose.yml logs delivery-service 
 
       - name: Debug - Print DELIVERY_ID
         run: |
