@@ -39,4 +39,8 @@ public class DeliveryService {
 
         return delivery.getOrderId();
     }
+
+    public Delivery findByOrderId(String orderId) {
+        return deliveryRepository.findByOrderId(orderId);
+    }
 }

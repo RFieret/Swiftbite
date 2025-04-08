@@ -1,10 +1,9 @@
 package com.swiftbite.services.deliveryService.controller;
 
-import com.swiftbite.services.deliveryService.model.AssignDelivererDTO;
+import com.swiftbite.services.deliveryService.DTO.AssignDelivererDTO;
 import com.swiftbite.services.deliveryService.model.Delivery;
 import com.swiftbite.services.deliveryService.service.DeliveryService;
 import com.swiftbite.services.deliveryService.service.MessageSender;
-import com.swiftbite.services.deliveryService.controller.MessageController;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.http.ResponseEntity;
@@ -15,7 +14,7 @@ import java.util.Map;
 
 
 @RestController
-@RequestMapping("/deliveries")
+@RequestMapping("api/deliveryservice")
 @RequiredArgsConstructor
 public class DeliveryController {
 
@@ -23,29 +22,37 @@ public class DeliveryController {
     private final DeliveryService deliveryService;
     private final MessageController messageController;
 
-    @PostMapping("/create-delivery")
+    @PostMapping("/createDelivery")
     public Delivery createDelivery(@RequestBody Delivery delivery) {
         return deliveryService.saveDelivery(delivery);
     }
 
-    @PostMapping("/assign-deliverer")
+    @PostMapping("/assignDeliverer")
     public void assignDeliverer(@RequestBody AssignDelivererDTO request) {
         deliveryService.assignDeliverer(request.getDeliveryId(), request.getDeliverer());
     }
 
-    @PostMapping("/deliverers-deliveries")
+    @PostMapping("/deliverersDeliveries")
     public ResponseEntity<List<Delivery>> getDeliveriesForDeliverer(@RequestBody Map<String, String> body) {
         String name = body.get("name");
         List<Delivery> deliveries = deliveryService.getDeliveriesForDeliverer(name);
         return ResponseEntity.ok(deliveries);
     }
 
-    @PostMapping("/complete-delivery")
-    public ResponseEntity<String> completeDelivery(@RequestBody Map<String, String> body){
-        String deliveryID = body.get("deliveryId");
-        String orderID = deliveryService.completeDelivery(deliveryID);
+    @PostMapping("/completeDelivery/{deliveryId}")
+    public ResponseEntity<String> completeDelivery(@PathVariable String deliveryId){
+        String orderID = deliveryService.completeDelivery(deliveryId);
 
-        messageController.sendCompleteOrderMessage(deliveryID, orderID);
+        messageController.sendCompleteOrderMessage(deliveryId, orderID);
         return ResponseEntity.ok("Message sent to RabbitMQ");
+    }
+
+    @GetMapping("/deliveryByOrder/{orderId}")
+    public ResponseEntity<Delivery> getDeliveryByOrderId(@PathVariable String orderId) {
+        Delivery delivery = deliveryService.findByOrderId(orderId);
+        if (delivery == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(delivery);
     }
 }

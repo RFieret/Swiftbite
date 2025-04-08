@@ -9,4 +9,6 @@ import java.util.List;
 public interface DeliveryRepository extends MongoRepository<Delivery, String> {
     @Query("{ 'deliverer.name': ?0, 'status': { $ne: 'Complete' } }")
     List<Delivery> findByDeliverer_Name(String name);
+
+    Delivery findByOrderId(String orderId);
 }

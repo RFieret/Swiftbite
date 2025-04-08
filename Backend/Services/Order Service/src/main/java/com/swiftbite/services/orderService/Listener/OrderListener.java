@@ -16,7 +16,7 @@ public class OrderListener {
 
     @RabbitListener(queues = RabbitMQConstants.QUEUE)
     public void handleOrderCompletedEvent(OrderCompletedEvent event) {
-        System.out.println("✅ Received event for order: " + event);
+        System.out.println("Received " + event.getEventType() +" for order: " + event.getOrderId());
         // Proceed to mark order as complete
     }
 }

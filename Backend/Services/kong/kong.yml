@@ -1,4 +1,11 @@
 _format_version: "3.0"
+
+upstreams:
+  - name: delivery-service
+    targets:
+      - target: delivery-service-1:8081
+      - target: delivery-service-2:8081
+
 services:
   - name: order-service
     url: http://order-service:8082
@@ -8,7 +15,7 @@ services:
           - /orders
 
   - name: delivery-service
-    url: http://delivery-service:8081
+    url: http://delivery-service
     routes:
       - name: delivery-route
         paths:
