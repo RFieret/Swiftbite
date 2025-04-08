@@ -52,7 +52,7 @@ jobs:
         run: |
           cd Backend/Services/Delivery\ Service
           chmod +x ./gradlew
-          ./gradlew test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DelivererAssignedTest"
+          ./gradlew e2eTest --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DelivererAssignedTest"
 
 
       - name: Step 5 - Complete the delivery
@@ -63,11 +63,11 @@ jobs:
         run: |
           cd Backend/Services/Delivery\ Service
           chmod +x ./gradlew
-          ./gradlew test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DeliveryCompletedTest"
+          ./gradlew e2eTest --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DeliveryCompletedTest"
 
       - name: Step 7 - Check OrderService received message
         run: |
-          docker-compose logs orderservice > orderservice.log
+          docker compose logs orderservice > orderservice.log
           grep "Received delivery complete for order: 1" orderservice.log
 
       - name: Cleanup

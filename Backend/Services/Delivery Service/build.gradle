@@ -32,3 +32,8 @@ tasks.named('test')  {
 	useJUnitPlatform()
 	exclude '**/E2EtestScripts/**'
 }
+
+task e2eTest(type: Test) {
+	useJUnitPlatform()
+	include '**/E2EtestScripts/**'
+}
