@@ -72,7 +72,6 @@ services:
       - "8081:8081"
     environment:
       SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_DATA_MONGODB_URI: mongodb://root:root@mongodb:27017/deliverydb?authSource=admin
     depends_on:
       - rabbitmq
       - mongodb
