@@ -46,7 +46,7 @@ jobs:
         run: |
           curl -X POST http://localhost:8000/api/deliveryservice/assignDeliverer \
                -H "Content-Type: application/json" \
-               -d '{"deliveryId": ${{ env.DELIVERY_ID }}, deliverer: {name: "piet", phone: "0612324444"}}'
+               -d "{\"deliveryId\": \"${{ env.DELIVERY_ID }}\", \"deliverer\": {\"name\": \"piet\", \"phone\": \"0612324444\"}}"
 
       - name: Step 4 - Verify delivery is assigned to driver (script)
         run: |
@@ -68,7 +68,7 @@ jobs:
       - name: Step 7 - Check OrderService received message
         run: |
           docker-compose logs orderservice > orderservice.log
-          grep "Received delivery complete for order abc123" orderservice.log
+          grep "Received delivery complete for order: 1" orderservice.log
 
       - name: Cleanup
         if: always()  # Runs even if earlier steps fail
