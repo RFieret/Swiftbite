@@ -28,7 +28,7 @@ jobs:
         run: docker compose -f ./Backend/Services/docker-compose.yml up -d --build
 
       - name: Wait for services to start
-        run: sleep 15
+        run: sleep 30
 
       - name: Step 1 - Create delivery
         run: |
