@@ -27,8 +27,8 @@ jobs:
       - name: Start application with Docker Compose
         run: docker compose -f ./Backend/Services/docker-compose.yml up -d --build
 
-      - name: Wait for services to start
-        run: sleep 30
+#      - name: Wait for services to start
+#        run: sleep 30
 
       - name: Step 1 - Create delivery
         run: |
@@ -65,10 +65,6 @@ jobs:
         run: |
           curl -X POST http://localhost:8000/deliveries/api/deliveryservice/completeDelivery/${{ env.DELIVERY_ID }}
 
-      - name: 🔍 Debug - Print delivery status before test
-        run: |
-          curl http://localhost:8081/api/deliveryservice/deliveryByOrder/1 | jq
-
       - name: Step 7 - Validate delivery is marked as complete (script)
         run: |
           cd Backend/Services/Delivery\ Service
@@ -77,7 +73,7 @@ jobs:
 
       - name: Step 8 - Check OrderService received message
         run: |
-          docker compose logs orderservice > orderservice.log
+          docker compose -f ./Backend/Services/docker-compose.yml logs orderservice > orderservice.log
           grep "Received delivery complete for order: 1" orderservice.log
 
       - name: Cleanup
