@@ -48,8 +48,19 @@ jobs:
       - name: Step 3 - Get delivery ID from orderId
         id: get_delivery_id
         run: |
-          DELIVERY_ID=$(curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1" | jq -r '.id')
-          echo "delivery_id=$DELIVERY_ID" >> $GITHUB_OUTPUT
+          echo "Waiting for delivery to exist..."
+          for i in {1..10}; do
+            DELIVERY_ID=$(curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1" | jq -r '.id')
+            if [ "$DELIVERY_ID" != "null" ]; then
+              echo "✅ Delivery found: $DELIVERY_ID"
+              echo "delivery_id=$DELIVERY_ID" >> $GITHUB_OUTPUT
+              exit 0
+            fi
+            echo "Still waiting for delivery..."
+            sleep 3
+          done
+          echo "❌ Delivery not found in time"
+          exit 1
 
       - name: Debug - Print DELIVERY_ID
         run: |
