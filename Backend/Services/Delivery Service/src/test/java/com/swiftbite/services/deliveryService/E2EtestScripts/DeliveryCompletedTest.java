@@ -16,7 +16,7 @@ public class DeliveryCompletedTest {
 
     @Test
     void deliveryShouldBeCompleted() {
-        Delivery delivery = deliveryRepository.findByOrderId("123");
+        Delivery delivery = deliveryRepository.findByOrderId("1");
         assertNotNull(delivery, "Delivery should not be null");
         assertEquals("completed", delivery.getStatus());
     }

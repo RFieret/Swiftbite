@@ -36,9 +36,6 @@ jobs:
                -H "Content-Type: application/json" \
                -d '{"id": "1","customerName": "Peter","address": "Boeksbrug","status": "Created"}'
 
-      - name: Debug - Check RabbitMQ queues
-        run: docker compose -f ./Backend/Services/docker-compose.yml exec rabbitmq rabbitmqctl list_queues
-
       - name: Step 2 - Verify delivery is created (script)
         run: |
           cd Backend/Services/Delivery\ Service
@@ -50,15 +47,6 @@ jobs:
         run: |
           DELIVERY_ID=$(curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1" | jq -r '.id')
           echo "DELIVERY_ID=$DELIVERY_ID" >> $GITHUB_ENV
-
-      - name: Debug - Print delivery-Service logs
-        run: |
-          docker compose -f ./Backend/Services/docker-compose.yml logs delivery-service 
-
-      - name: Debug - Print DELIVERY_ID
-        run: |
-          echo "DELIVERY_ID is: ${{ env.DELIVERY_ID }}"
-
 
       - name: Step 4 - Assign driver to delivery
         run: |
