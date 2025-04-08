@@ -15,7 +15,7 @@ public class DeliveryCreatedTest {
 
     @Test
     void deliveryShouldBeCreated() {
-        var delivery = deliveryRepository.findByOrderId("1");
+        var delivery = deliveryRepository.findByOrderId("2");
         assertNotNull(delivery, "Delivery should not be null");
         assertEquals("created", delivery.getStatus());
     }
