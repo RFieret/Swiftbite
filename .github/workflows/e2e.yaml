@@ -49,16 +49,15 @@ jobs:
                -d '{"deliveryId": ${{ env.DELIVERY_ID }}, deliverer: {name: "piet", phone: "0612324444"}}'
 
       - name: Step 4 - Verify delivery is assigned to driver (script)
-        run: |
-          java -cp ./delivery-service/build/classes/java/test com.swiftbite.services.deliveryService.E2EtestScripts.DelivererAssignedTest
+        run: ./gradlew test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DelivererAssignedTest"
+
 
       - name: Step 5 - Complete the delivery
         run: |
           curl -X POST http://localhost:8000/api/deliveryservice/completeDelivery/${{ env.DELIVERY_ID }}
 
       - name: Step 6 - Validate delivery is marked as complete (script)
-        run: |
-          java -cp ./delivery-service/build/classes/java/test com.swiftbite.services.deliveryService.E2EtestScripts.DeliveryCompletedTest
+        run: ./gradlew test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DeliveryCompletedTest"
 
       - name: Step 7 - Check OrderService received message
         run: |
