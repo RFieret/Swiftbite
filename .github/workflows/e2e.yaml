@@ -45,11 +45,16 @@ jobs:
           DELIVERY_ID=$(curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1" | jq -r '.id')
           echo "DELIVERY_ID=$DELIVERY_ID" >> $GITHUB_ENV
 
+      - name: Debug - Print DELIVERY_ID
+        run: |
+          echo "DELIVERY_ID is: ${{ env.DELIVERY_ID }}"
+
+
       - name: Step 3 - Assign driver to delivery
         run: |
           curl -X POST http://localhost:8000/deliveries/api/deliveryservice/assignDeliverer \
                -H "Content-Type: application/json" \
-               -d "{"deliveryId": "${{ env.DELIVERY_ID }}", "deliverer": {"name": "piet", "phone": "0612324444"}}"
+               -d '{"deliveryId": "${{ env.DELIVERY_ID }}", "deliverer": {"name": "piet", "phone": "0612324444"}}'
 
       - name: Step 4 - Verify delivery is assigned to driver (script)
         run: |
