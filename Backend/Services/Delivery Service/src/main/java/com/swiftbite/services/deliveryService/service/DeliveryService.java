@@ -34,7 +34,7 @@ public class DeliveryService {
         Delivery delivery = deliveryRepository.findById(deliveryId)
                 .orElseThrow(() -> new RuntimeException("Delivery not found"));
 
-        delivery.setStatus("Complete");
+        delivery.setStatus("Completed");
         deliveryRepository.save(delivery);
 
         return delivery.getOrderId();
