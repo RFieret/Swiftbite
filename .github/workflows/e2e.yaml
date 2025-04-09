@@ -73,13 +73,13 @@ jobs:
 
       - name: Step 8 - Check OrderService received message
         run: |
-          docker compose -f ./Backend/Services/docker-compose.yml logs order-service > orderservice.log
-          grep "Received delivery complete for order: 1" orderservice.log
+          docker compose -f ./Backend/Services/docker-compose.yml logs order-service > order-service.log
+          grep "Received delivery complete for order: 1" order-service.log
 
       - name: Cleanup
         if: always()  # Runs even if earlier steps fail
         run: |
           echo "Cleaning up..."
           docker-compose down -v
-          rm -f orderservice.log || true
+          rm -f order-service.log || true
 
