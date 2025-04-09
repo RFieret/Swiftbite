@@ -78,9 +78,9 @@ jobs:
           grep "Received DeliveryCompleted for order: 1" order-service.log
 
       - name: Cleanup
-        if: always()  # Runs even if earlier steps fail
+        if: always()
         run: |
           echo "Cleaning up..."
-          docker compose -f ./Backend/Services/docker-compose.yml logs order-service down -v
+          docker compose -f ./Backend/Services/docker-compose.yml down --volumes
           rm -f order-service.log || true
 
