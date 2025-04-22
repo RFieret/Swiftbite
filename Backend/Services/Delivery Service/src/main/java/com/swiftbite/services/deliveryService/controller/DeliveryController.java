@@ -24,7 +24,11 @@ public class DeliveryController {
 
     @PostMapping("/createDelivery")
     public Delivery createDelivery(@RequestBody Delivery delivery) {
-        return deliveryService.saveDelivery(delivery);
+        Delivery createdDelivery = deliveryService.saveDelivery(delivery);
+
+        System.out.println(createdDelivery);
+
+        return createdDelivery;
     }
 
     @PostMapping("/assignDeliverer")
