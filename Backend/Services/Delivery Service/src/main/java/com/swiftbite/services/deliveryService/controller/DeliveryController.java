@@ -66,7 +66,7 @@ public class DeliveryController {
     }
 
     @GetMapping("/test")
-    public string testCall() {
-        return "Test worked";
+    public ResponseEntity<String> testCall() {
+        return ResponseEntity.ok("Test worked");
     }
 }
