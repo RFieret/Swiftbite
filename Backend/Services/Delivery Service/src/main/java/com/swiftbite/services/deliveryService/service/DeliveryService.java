@@ -43,4 +43,6 @@ public class DeliveryService {
     public Delivery findByOrderId(String orderId) {
         return deliveryRepository.findByOrderId(orderId);
     }
+
+    public List<Delivery> getDeliveriesByStatus(String status) {return deliveryRepository.findByStatus(status);}
 }

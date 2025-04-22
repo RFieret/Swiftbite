@@ -55,4 +55,18 @@ public class DeliveryController {
         }
         return ResponseEntity.ok(delivery);
     }
+
+    @GetMapping("/getOpenDeliveries")
+    public ResponseEntity<List<Delivery>> getOpenDeliveries() {
+        List<Delivery> deliveries = deliveryService.getDeliveriesByStatus("Created");
+        if (deliveries == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(deliveries);
+    }
+
+    @GetMapping("/test")
+    public string testCall() {
+        return "Test worked";
+    }
 }
