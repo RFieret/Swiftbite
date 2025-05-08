@@ -118,7 +118,7 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_healthy
-    command: './gradlew test'
+    command: ['gradle', 'test']
     networks:
       - e2e-tests
 
