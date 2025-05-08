@@ -1,86 +1,12 @@
 name: E2E Workflow
 
-on:
-  push:
-    branches: [master]
-  pull_request:
+on: [push]
 
 jobs:
-  e2e:
+  e2e-tests:
     runs-on: ubuntu-latest
-
-    services:
-      docker:
-        image: docker:24.0.5
-        options: --privileged
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Java
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'temurin'
-          java-version: '21'
-
-      - name: Start application with Docker Compose
-        run: docker compose -f ./Backend/Services/docker-compose.yml up -d --build
-
-      - name: Wait for services to start
-        run: sleep 30
-
-      - name: Step 1 - Create delivery
+      - uses: actions/checkout@v3
+      - name: Start containers en voer tests uit
         run: |
-          curl -i -X POST http://localhost:8000/orders/api/orderService/createDelivery \
-               -H "Content-Type: application/json" \
-               -d '{"id": "1","customerName": "Peter","address": "Boeksbrug","status": "Created"}'
-
-      - name: Step 2 - Verify delivery is created (script)
-        run: |
-          cd Backend/Services/Delivery\ Service
-          chmod +x ./gradlew
-          ./gradlew e2eTest -Dspring.profiles.active=test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DeliveryCreatedTest"
-
-      - name: Step 3 - Get delivery ID from orderId
-        id: get_delivery_id
-        run: |
-          DELIVERY_ID=$(curl -s "http://localhost:8000/deliveries/api/deliveryservice/deliveryByOrder/1" | jq -r '.id')
-          echo "DELIVERY_ID=$DELIVERY_ID" >> $GITHUB_ENV
-
-      - name: Step 4 - Assign driver to delivery
-        run: |
-          curl -X POST http://localhost:8000/deliveries/api/deliveryservice/assignDeliverer \
-               -H "Content-Type: application/json" \
-               -d '{"deliveryId": "${{ env.DELIVERY_ID }}", "deliverer": {"name": "piet", "phone": "0612324444"}}'
-
-      - name: Step 5 - Verify delivery is assigned to driver (script)
-        run: |
-          cd Backend/Services/Delivery\ Service
-          chmod +x ./gradlew
-          ./gradlew e2eTest -Dspring.profiles.active=test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DelivererAssignedTest"
-
-
-      - name: Step 6 - Complete the delivery
-        run: |
-          curl -X POST http://localhost:8000/deliveries/api/deliveryservice/completeDelivery/${{ env.DELIVERY_ID }}
-
-      - name: Step 7 - Validate delivery is marked as complete (script)
-        run: |
-          cd Backend/Services/Delivery\ Service
-          chmod +x ./gradlew
-          ./gradlew e2eTest -Dspring.profiles.active=test --tests "com.swiftbite.services.deliveryService.E2EtestScripts.DeliveryCompletedTest"
-
-      - name: Step 8 - Check OrderService received message
-        run: |
-          docker compose -f ./Backend/Services/docker-compose.yml logs order-service > order-service.log
-          cat order-service.log
-          grep "Received DeliveryCompleted for order: 1" order-service.log
-
-      - name: Cleanup
-        if: always()
-        run: |
-          echo "Cleaning up..."
-          docker compose -f ./Backend/Services/docker-compose.yml down --volumes
-          rm -f order-service.log || true
-
+          docker-compose -f docker-compose-test.yaml up --abort-on-container-exit --exit-code-from test-runner

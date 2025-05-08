@@ -1,0 +1,130 @@
+services:
+  rabbitmq:
+    image: rabbitmq:4-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: [ "CMD", "rabbitmqctl", "status" ]
+      interval: 3s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+    networks:
+      - e2e-tests
+
+  mongodb:
+    image: mongo:6
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: root
+    healthcheck:
+      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - e2e-tests
+
+#  order-postgresql:
+#    image: postgres:15
+#    container_name: postgres-db
+#    restart: always
+#    environment:
+#      POSTGRES_USER: ${POSTGRES_USER}
+#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#      POSTGRES_DB: ${POSTGRES_DB}
+#    volumes:
+#      - postgres_order_data:/var/lib/postgresql/data
+#    ports:
+#      - "5432:5432"
+#    networks:
+#      - kong-net
+
+  order-service:
+    image: 494690/order-service:latest
+    ports:
+      - "8082:8082"
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8082/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - e2e-tests
+
+  delivery-service:
+    image: 494690/delivery-service:latest
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_RABBITMQ_HOST: rabbitmq
+      SPRING_DATA_MONGODB_URI: mongodb://root:root@mongodb:27017/deliverydb?authSource=admin
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8081/actuator/health" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    networks:
+      - e2e-tests
+
+  kong:
+    image: kong:3.5
+    environment:
+      KONG_DATABASE: off
+      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yml
+      KONG_PROXY_ACCESS_LOG: /dev/stdout
+      KONG_ADMIN_ACCESS_LOG: /dev/stdout
+      KONG_PROXY_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_ERROR_LOG: /dev/stderr
+      KONG_ADMIN_LISTEN: 0.0.0.0:8001
+    ports:
+      - "8000:8000"
+      - "8001:8001"
+    volumes:
+      - ./kong.yml:/kong/declarative/kong.yml
+    networks:
+      - e2e-tests
+
+  test-runner:
+    build:
+      context:
+        './'
+    depends_on:
+      order-service:
+        condition: service_healthy
+      delivery-service:
+        condition: service_healthy
+      kong:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    command: './gradlew test'
+    networks:
+      - e2e-tests
+
+volumes:
+  mongo-data:
+
+networks:
+  e2e-tests:
+    driver: bridge

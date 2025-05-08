@@ -1,0 +1,66 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.5'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+// Task for running just the E2E tests
+task e2eTest(type: Test) {
+	useJUnitPlatform {
+		includeTags 'e2e'
+	}
+	testLogging {
+		events "passed", "skipped", "failed"
+		showStandardStreams = true
+	}
+}
+
+group = 'com.e2e'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter'
+	implementation "com.rabbitmq:amqp-client:5.20.0"
+	implementation 'org.glassfish:jakarta.json:2.0.1'
+	implementation 'org.apache.groovy:groovy:4.0.15'
+
+	// Change implementation to testImplementation for test libraries
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.junit.jupiter:junit-jupiter'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	testImplementation "org.testcontainers:testcontainers:1.19.3"
+	testImplementation "org.testcontainers:junit-jupiter:1.19.3"
+	testImplementation "org.testcontainers:rabbitmq:1.19.3"
+}
+
+sourceSets {
+	test {
+		java {
+			srcDirs = ['src/test/java']
+		}
+	}
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+	testLogging {
+		events "passed", "skipped", "failed"
+		showStandardStreams = true
+	}
+
+	// Print out all discovered tests
+	beforeTest { descriptor ->
+		logger.lifecycle("Running test: ${descriptor}")
+	}
+}
