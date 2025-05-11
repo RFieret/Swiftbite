@@ -7,6 +7,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Start containers en voer tests uit
+      - name: Start containers en do tests
         run: |
-          docker compose -f ./Backend/Services/e2e-tests/docker-compose-test.yaml up --abort-on-container-exit --exit-code-from test-runner
+          docker compose -f ./Backend/Services/e2e-tests/docker-compose-test.yaml up --build --abort-on-container-exit --exit-code-from test-runner

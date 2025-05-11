@@ -8,6 +8,7 @@ upstreams:
 services:
   - name: order-service
     url: http://order-service:8082
+    protocol: http
     routes:
       - name: order-route
         paths:
@@ -15,6 +16,7 @@ services:
 
   - name: delivery-service
     url: http://delivery-service
+    protocol: http
     routes:
       - name: delivery-route
         paths:

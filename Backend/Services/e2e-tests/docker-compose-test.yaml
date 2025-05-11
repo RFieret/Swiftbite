@@ -26,10 +26,10 @@ services:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: root
     healthcheck:
-      test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 1
     networks:
       - e2e-tests
 
@@ -49,7 +49,9 @@ services:
 #      - kong-net
 
   order-service:
-    image: 494690/order-service:latest
+    build:
+      context:
+        '../Order Service'
     ports:
       - "8082:8082"
     environment:
@@ -59,14 +61,16 @@ services:
         condition: service_healthy
     healthcheck:
       test: [ "CMD", "curl", "-f", "http://localhost:8082/actuator/health" ]
-      interval: 30s
+      interval: 10s
       timeout: 10s
-      retries: 5
+      retries: 3
     networks:
       - e2e-tests
 
   delivery-service:
-    image: 494690/delivery-service:latest
+    build:
+      context:
+        '../Delivery Service'
     ports:
       - "8081:8081"
     environment:
