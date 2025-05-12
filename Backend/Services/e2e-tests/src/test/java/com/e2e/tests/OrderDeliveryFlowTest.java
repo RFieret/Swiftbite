@@ -36,45 +36,6 @@ import org.junit.jupiter.api.Tag;
 @Tag("e2e")
 public class OrderDeliveryFlowTest {
 
-    private static final String DELIVERY_QUEUE = "delivery.queue";
-    private static Connection rabbitConnection;
-    private static Channel rabbitChannel;
-
-    @BeforeAll
-    public static void setup() throws Exception {
-        // Docker Compose is started automatically by Testcontainers
-        System.out.println("Started rabbitmq");
-
-        // Wait for all containers to be up and healthy
-        Thread.sleep(5000);
-
-        // Setup RabbitMQ connection for test verification
-        ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost("localhost");
-        factory.setPort(5672);
-        factory.setUsername("guest");
-        factory.setPassword("guest");
-
-        rabbitConnection = factory.newConnection();
-        rabbitChannel = rabbitConnection.createChannel();
-
-        // Ensure queues are declared
-        rabbitChannel.queueDeclare(DELIVERY_QUEUE, true, false, false, null);
-
-        // Additional setup if needed
-        Thread.sleep(2000);
-    }
-
-    @AfterAll
-    public static void tearDown() throws Exception {
-        if (rabbitChannel != null && rabbitChannel.isOpen()) {
-            rabbitChannel.close();
-        }
-        if (rabbitConnection != null && rabbitConnection.isOpen()) {
-            rabbitConnection.close();
-        }
-    }
-
     @Test
     public void testOrderDeliveryFlow() throws Exception {
 
