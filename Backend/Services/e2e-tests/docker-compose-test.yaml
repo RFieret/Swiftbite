@@ -131,4 +131,3 @@ volumes:
 
 networks:
   e2e-tests:
-    driver: bridge
