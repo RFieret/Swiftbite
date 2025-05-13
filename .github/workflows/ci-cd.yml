@@ -1,57 +1,89 @@
 name: CI/CD Pipeline
 
 on:
-  push:
-    branches:
-      - master  # Trigger pipeline on push to 'main' branch
-jobs:
-  build-and-push:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  workflow_run:
+    workflows: ["E2E Workflow"]
+    types:
+      - completed
 
-      - name: Set up JDK 21
+jobs:
+  setup-java:
+    runs-on: ubuntu-latest
+    outputs:
+      java-version: '21'
+    steps:
+      - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: Make gradlew executable (Order Service)
-        working-directory: "Backend/Services/Order Service"
+  build-order-service:
+    needs: setup-java
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Backend/Services/Order Service
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Make gradlew executable
         run: chmod +x ./gradlew
 
       - name: Build Order Service JAR
-        working-directory: "Backend/Services/Order Service"
         run: ./gradlew clean build
 
+  build-delivery-service:
+    needs: setup-java
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Backend/Services/Delivery Service
+    steps:
+      - uses: actions/checkout@v4
 
-      - name: Make gradlew executable (Delivery Service)
-        working-directory: "Backend/Services/Delivery Service"
+      - name: Make gradlew executable
         run: chmod +x ./gradlew
 
       - name: Build Delivery Service JAR
-        working-directory: "Backend/Services/Delivery Service"
         run: ./gradlew clean build
 
-
-      - name: Set up Docker
-        uses: docker/setup-buildx-action@v2
-
-      - name: Log in to Docker Hub
+  docker-login:
+    runs-on: ubuntu-latest
+    outputs:
+      logged-in: ${{ steps.login.outcome }}
+    steps:
+      - name: Docker Login
+        id: login
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build and push Order Service image
+  push-order-service:
+    needs: [build-order-service, docker-login]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
         working-directory: Backend/Services
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build & Push Order Service Image
         run: |
           docker build -t docker.io/494690/order-service:latest "Order Service"
           docker push docker.io/494690/order-service:latest
 
-      - name: Build and push Delivery Service image
+  push-delivery-service:
+    needs: [build-delivery-service, docker-login]
+    runs-on: ubuntu-latest
+    defaults:
+      run:
         working-directory: Backend/Services
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build & Push Delivery Service Image
         run: |
           docker build -t docker.io/494690/delivery-service:latest "Delivery Service"
           docker push docker.io/494690/delivery-service:latest
