@@ -13,7 +13,6 @@ jobs:
 
       - name: Test Auth0 connectivity
         run: |
-          cd ./Backend/Services/e2e-tests/
           
           AUTH0_DOMAIN="${{ secrets.OAUTH2_JWT_ISSUER_URI }}"
           CLIENT_ID="${{ secrets.AUTH0_CLIENT_ID }}"
