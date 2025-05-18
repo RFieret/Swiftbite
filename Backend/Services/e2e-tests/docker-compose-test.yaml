@@ -23,8 +23,8 @@ services:
     volumes:
       - mongo-data:/data/db
     environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: root
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_INITDB_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
     healthcheck:
       test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
@@ -74,8 +74,9 @@ services:
     ports:
       - "8081:8081"
     environment:
-      SPRING_RABBITMQ_HOST: rabbitmq
-      SPRING_DATA_MONGODB_URI: mongodb://root:root@mongodb:27017/deliverydb?authSource=admin
+      OAUTH2_JWT_AUDIENCES: ${OAUTH2_JWT_AUDIENCES}
+      OAUTH2_JWT_ISSUER_URI: ${OAUTH2_JWT_ISSUER_URI}
+      MONGO_INITDB_URI: ${MONGO_INITDB_URI}
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -122,6 +123,11 @@ services:
         condition: service_healthy
       mongodb:
         condition: service_healthy
+    environment:
+      OAUTH2_JWT_AUDIENCES: ${TEST_OAUTH2_JWT_AUDIENCES}
+      OAUTH2_JWT_ISSUER_URI: ${TEST_OAUTH2_JWT_ISSUER_URI}
+      AUTH0_CLIENT_ID: ${TEST_AUTH0_CLIENT_ID}
+      AUTH0_CLIENT_SECRET: ${TEST_AUTH0_CLIENT_SECRET}
     command: ['gradle', 'test']
     networks:
       - e2e-tests
@@ -131,3 +137,4 @@ volumes:
 
 networks:
   e2e-tests:
+    driver: bridge

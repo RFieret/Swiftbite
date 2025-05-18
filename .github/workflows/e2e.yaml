@@ -6,7 +6,24 @@ jobs:
   e2e-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Start containers en do tests
+      - name: Create .env file from GitHub secrets
         run: |
-          docker compose -f ./Backend/Services/e2e-tests/docker-compose-test.yaml up --build --abort-on-container-exit --exit-code-from test-runner && docker compose -f docker-compose-test.yaml down --volumes --remove-orphans
+          cat <<EOF > .env
+          TEST_OAUTH2_JWT_ISSUER_URI=${{ secrets.OAUTH2_JWT_ISSUER_URI }}
+          TEST_OAUTH2_JWT_AUDIENCES=${{ secrets.OAUTH2_JWT_AUDIENCES }}
+          TEST_AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }}
+          TEST_AUTH0_CLIENT_SECRET=${{ secrets.AUTH0_CLIENT_SECRET }}
+          MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
+          MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
+          MONGO_INITDB_URI=${{secrets.MONGO_INITDB_URI}}
+          EOF
+          
+
+      - uses: actions/checkout@v3
+      - name: Run integration tests with Docker Compose
+        run: |
+          docker compose -f docker-compose-test.yaml --env-file .env up --build --abort-on-container-exit --exit-code-from test-runner
+
+      - name: Clean up
+        if: always()
+        run: docker compose -f docker-compose-test.yaml down --volumes --remove-orphans
