@@ -13,6 +13,8 @@ jobs:
 
       - name: Create .env file from GitHub secrets
         run: |
+          echo "OAUTH2_JWT_ISSUER_URI=${{ secrets.OAUTH2_JWT_ISSUER_URI }}" >> .env
+          echo "OAUTH2_JWT_AUDIENCES=${{ secrets.OAUTH2_JWT_AUDIENCES }}" >> .env
           echo "TEST_OAUTH2_JWT_ISSUER_URI=${{ secrets.OAUTH2_JWT_ISSUER_URI }}" >> .env
           echo "TEST_OAUTH2_JWT_AUDIENCES=${{ secrets.OAUTH2_JWT_AUDIENCES }}" >> .env
           echo "TEST_AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }}" >> .env
