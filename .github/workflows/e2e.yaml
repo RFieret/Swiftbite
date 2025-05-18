@@ -20,7 +20,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Run integration tests with Docker Compose
         run: |
-          docker compose -f ./Backend/Services/e2e-tests/docker-compose-test.yaml --env-file /home/runner/work/Swiftbite/Swiftbite/.env up --build --abort-on-container-exit --exit-code-from test-runner
+          docker compose -f ./Backend/Services/e2e-tests/docker-compose-test.yaml up --build --abort-on-container-exit --exit-code-from test-runner
 
       - name: Clean up
         if: always()
