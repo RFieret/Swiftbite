@@ -7,17 +7,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create .env file from GitHub secrets
-        working-directory: /home/runner/work/Swiftbite/Swiftbite
         run: |
-          cat <<EOF > .env
-          TEST_OAUTH2_JWT_ISSUER_URI=${{ secrets.OAUTH2_JWT_ISSUER_URI }}
-          TEST_OAUTH2_JWT_AUDIENCES=${{ secrets.OAUTH2_JWT_AUDIENCES }}
-          TEST_AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }}
-          TEST_AUTH0_CLIENT_SECRET=${{ secrets.AUTH0_CLIENT_SECRET }}
-          MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }}
-          MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}
-          MONGO_INITDB_URI=${{secrets.MONGO_INITDB_URI}}
-          EOF
+          echo "TEST_OAUTH2_JWT_ISSUER_URI=${{ secrets.OAUTH2_JWT_ISSUER_URI }}" >> .env
+          echo "TEST_OAUTH2_JWT_AUDIENCES=${{ secrets.OAUTH2_JWT_AUDIENCES }}" >> .env
+          echo "TEST_AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }}" >> .env
+          echo "TEST_AUTH0_CLIENT_SECRET=${{ secrets.AUTH0_CLIENT_SECRET }}" >> .env
+          echo "MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }}" >> .env
+          echo "MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}" >> .env
+          echo "MONGO_INITDB_URI=${{secrets.MONGO_INITDB_URI}}" >> .env
           
 
       - uses: actions/checkout@v3
