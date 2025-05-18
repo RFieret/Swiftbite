@@ -45,7 +45,14 @@ public class OrderDeliveryFlowTest {
         String clientSecret = System.getenv("AUTH0_CLIENT_SECRET");
         String audience = System.getenv("OAUTH2_JWT_AUDIENCES"); // Must match API audience in Auth0
 
+        System.out.println("Auth0 domain: " + authDomain);
+        System.out.println("Auth0 client ID: " + clientId);
+        System.out.println("Auth0 client secret: " + clientSecret);
+        System.out.println("Auth0 audience: " + audience);
+
         String tokenUrl = authDomain + "/oauth/token";
+
+        System.out.println("Token URL: " + tokenUrl);
 
         String requestBody = """
         {
@@ -55,6 +62,8 @@ public class OrderDeliveryFlowTest {
           "grant_type": "client_credentials"
         }
         """.formatted(clientId, clientSecret, audience);
+
+        System.out.println("Request body: " + requestBody);
 
         HttpRequest tokenRequest = HttpRequest.newBuilder()
                 .uri(URI.create(tokenUrl))
