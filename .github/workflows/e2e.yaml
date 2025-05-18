@@ -11,48 +11,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Test Auth0 connectivity
-        run: |
-          
-          AUTH0_DOMAIN="${{ secrets.OAUTH2_JWT_ISSUER_URI }}"
-          CLIENT_ID="${{ secrets.AUTH0_CLIENT_ID }}"
-          CLIENT_SECRET="${{ secrets.AUTH0_CLIENT_SECRET }}"
-          AUDIENCE="${{ secrets.OAUTH2_JWT_AUDIENCES }}"
-          
-          # Remove any trailing slashes from domain
-          AUTH0_DOMAIN=${AUTH0_DOMAIN%/}
-          
-          # Test connectivity with curl
-          echo "Testing Auth0 connectivity..."
-          curl -s -o /dev/null -w "%{http_code}" $AUTH0_DOMAIN/.well-known/jwks.json
-          
-          # Try to get a token (will show only status code, not the actual token)
-          echo "Attempting to get token..."
-          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
-            -H "Content-Type: application/json" \
-            -d "{\"client_id\":\"$CLIENT_ID\",\"client_secret\":\"$CLIENT_SECRET\",\"audience\":\"$AUDIENCE\",\"grant_type\":\"client_credentials\"}" \
-            $AUTH0_DOMAIN/oauth/token)
-          
-          echo "Auth0 token request status: $RESPONSE"
-          
-          # If not 200, show more details but mask sensitive values
-          if [ "$RESPONSE" != "200" ]; then
-            FULL_RESPONSE=$(curl -s -X POST \
-              -H "Content-Type: application/json" \
-              -d "{\"client_id\":\"$CLIENT_ID\",\"client_secret\":\"$CLIENT_SECRET\",\"audience\":\"$AUDIENCE\",\"grant_type\":\"client_credentials\"}" \
-              $AUTH0_DOMAIN/oauth/token)
-          
-            # Mask any tokens in the output
-            echo "Detailed error (sensitive values masked):"
-            echo $FULL_RESPONSE | sed 's/"access_token":"[^"]*"/"access_token":"***"/g' | sed 's/"refresh_token":"[^"]*"/"refresh_token":"***"/g'
-          fi
-
       - name: Create .env file from GitHub secrets
         run: |
           echo "OAUTH2_JWT_ISSUER_URI=${{ secrets.OAUTH2_JWT_ISSUER_URI }}" >> .env
           echo "OAUTH2_JWT_AUDIENCES=${{ secrets.OAUTH2_JWT_AUDIENCES }}" >> .env
-          echo "TEST_OAUTH2_JWT_ISSUER_URI=${{ secrets.OAUTH2_JWT_ISSUER_URI }}" >> .env
-          echo "TEST_OAUTH2_JWT_AUDIENCES=${{ secrets.OAUTH2_JWT_AUDIENCES }}" >> .env
+          echo "TEST_OAUTH2_JWT_ISSUER_URI=${{ secrets.TEST_OAUTH2_JWT_ISSUER_URI }}" >> .env
+          echo "TEST_OAUTH2_JWT_AUDIENCES=${{ secrets.TEST_OAUTH2_JWT_AUDIENCES }}" >> .env
           echo "TEST_AUTH0_CLIENT_ID=${{ secrets.AUTH0_CLIENT_ID }}" >> .env
           echo "TEST_AUTH0_CLIENT_SECRET=${{ secrets.AUTH0_CLIENT_SECRET }}" >> .env
           echo "MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }}" >> .env
