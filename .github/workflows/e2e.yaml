@@ -6,6 +6,7 @@ jobs:
   e2e-tests:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Set correct location
         run: cd ./Backend/Services/e2e-tests/
 
@@ -18,9 +19,7 @@ jobs:
           echo "MONGO_INITDB_ROOT_USERNAME=${{ secrets.MONGO_INITDB_ROOT_USERNAME }}" >> .env
           echo "MONGO_INITDB_ROOT_PASSWORD=${{ secrets.MONGO_INITDB_ROOT_PASSWORD }}" >> .env
           echo "MONGO_INITDB_URI=${{secrets.MONGO_INITDB_URI}}" >> .env
-          
 
-      - uses: actions/checkout@v3
       - name: Run integration tests with Docker Compose
         run: |
           docker compose -f docker-compose-test.yaml up --build --abort-on-container-exit --exit-code-from test-runner
