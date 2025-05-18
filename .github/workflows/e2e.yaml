@@ -6,6 +6,11 @@ jobs:
   e2e-tests:
     runs-on: ubuntu-latest
     steps:
+      - name: Debug paths
+        run: |
+          echo "Current dir: $(pwd)"
+          echo "Top-level files:"
+          ls -R
       - name: Create .env file from GitHub secrets
         working-directory: ./Backend/Services/e2e-tests
         run: |
