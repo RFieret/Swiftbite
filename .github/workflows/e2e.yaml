@@ -25,7 +25,31 @@ jobs:
 
       - name: Run integration tests with Docker Compose
         run: |
-          docker compose -f docker-compose-test.yaml up --build --abort-on-container-exit --exit-code-from test-runner
+          # Use -d to run in detached mode so we can extract reports later
+          docker compose -f docker-compose-test.yaml up --build -d
+          
+          # Wait for the test to complete
+          docker compose -f docker-compose-test.yaml logs -f test-runner
+          
+          # Get the container ID
+          TEST_CONTAINER_ID=$(docker compose -f docker-compose-test.yaml ps -q test-runner)
+          
+          # Copy test reports from the container
+          mkdir -p test-reports
+          docker cp $TEST_CONTAINER_ID:/app/build/reports/tests/test/. test-reports/
+          
+          # Check if tests passed by looking at the exit code
+          docker wait $TEST_CONTAINER_ID
+          EXIT_CODE=$?
+          
+          exit $EXIT_CODE
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-reports
+          path: ./Backend/Services/e2e-tests/test-reports/
 
       - name: Clean up
         if: always()
