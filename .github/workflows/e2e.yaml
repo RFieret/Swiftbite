@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Create .env file from GitHub secrets
-        working-directory: Swiftbite
+        working-directory: ./Backend/Services/e2e-tests
         run: |
           cat <<EOF > .env
           TEST_OAUTH2_JWT_ISSUER_URI=${{ secrets.OAUTH2_JWT_ISSUER_URI }}
