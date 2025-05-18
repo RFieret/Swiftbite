@@ -22,11 +22,9 @@ jobs:
 
       - uses: actions/checkout@v3
       - name: Run integration tests with Docker Compose
-        working-directory: /home/runner/work/Swiftbite/Swiftbite
         run: |
-          docker compose -f docker-compose-test.yaml --env-file .env up --build --abort-on-container-exit --exit-code-from test-runner
+          docker compose -f ./Backend/Services/e2e-tests/docker-compose-test.yaml --env-file /home/runner/work/Swiftbite/Swiftbite/.env up --build --abort-on-container-exit --exit-code-from test-runner
 
       - name: Clean up
-        working-directory: /home/runner/work/Swiftbite/Swiftbite
         if: always()
-        run: docker compose -f docker-compose-test.yaml down --volumes --remove-orphans
+        run: docker compose -f ./Backend/Services/e2e-tests/docker-compose-test.yaml down --volumes --remove-orphans
