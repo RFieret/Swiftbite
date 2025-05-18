@@ -72,10 +72,27 @@ public class OrderDeliveryFlowTest {
                 .build();
 
         HttpClient client = HttpClient.newHttpClient();
-        HttpResponse<String> response = client.send(tokenRequest, HttpResponse.BodyHandlers.ofString());
+        HttpResponse<String> response;
 
-        if (response.statusCode() != 200) {
-            throw new RuntimeException("Failed to get Auth0 token: " + response.body());
+        try {
+            // Your existing code to get Auth0 token
+            response = client.send(tokenRequest, HttpResponse.BodyHandlers.ofString());
+
+            // Add detailed error output
+            if (response.statusCode() != 200) {
+                System.err.println("Auth0 token request failed with status code: " + response.statusCode());
+                System.err.println("Response body: " + response.body());
+                // Print all response headers for debugging
+                response.headers().map().forEach((key, values) -> {
+                    System.err.println(key + ": " + String.join(", ", values));
+                });
+                throw new RuntimeException("Failed to get Auth0 token: " + response.body());
+            }
+            // Rest of your code
+        } catch (Exception e) {
+            System.err.println("Exception during Auth0 token request: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
 
         // Extract access_token from the response
