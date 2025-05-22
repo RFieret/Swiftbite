@@ -72,8 +72,9 @@ jobs:
 
       - name: Build & Push Order Service Image
         run: |
-          docker build -t docker.io/494690/order-service:latest "Order Service"
-          docker push docker.io/494690/order-service:latest
+          VERSION="v1.0.$(date +%s)"
+          docker build -t docker.io/494690/order-service:${VERSION} "Order Service"
+          docker push docker.io/494690/order-service:${VERSION}
 
   push-delivery-service:
     needs: [build-delivery-service, docker-login]
@@ -86,5 +87,6 @@ jobs:
 
       - name: Build & Push Delivery Service Image
         run: |
-          docker build -t docker.io/494690/delivery-service:latest "Delivery Service"
-          docker push docker.io/494690/delivery-service:latest
+          VERSION="v1.0.$(date +%s)"
+          docker build -t docker.io/494690/delivery-service:${VERSION} "Delivery Service"
+          docker push docker.io/494690/delivery-service:${VERSION}
