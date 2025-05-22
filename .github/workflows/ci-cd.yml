@@ -62,9 +62,9 @@ jobs:
 
       - name: Build Delivery Service JAR
         env:
-          OAUTH2_JWT_AUDIENCES: secrets.OAUTH2_JWT_AUDIENCES
-          OAUTH2_JWT_ISSUER_URI: secrets.OAUTH2_JWT_ISSUER_URI
-          MONGO_INITDB_URI: secrets.MONGO_INITDB_URI
+          OAUTH2_JWT_AUDIENCES: ${{ secrets.OAUTH2_JWT_AUDIENCES }}
+          OAUTH2_JWT_ISSUER_URI: ${{ secrets.OAUTH2_JWT_ISSUER_URI }}
+          MONGO_INITDB_URI:  ${{ secrets.MONGO_INITDB_URI }}
         run: ./gradlew clean build
 
   docker-login:
