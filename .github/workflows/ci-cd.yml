@@ -37,13 +37,19 @@ jobs:
   build-delivery-service:
     needs: setup-java
     runs-on: ubuntu-latest
-    env:
-      OAUTH2_JWT_AUDIENCES: secrets.OAUTH2_JWT_AUDIENCES
-      OAUTH2_JWT_ISSUER_URI: secrets.OAUTH2_JWT_ISSUER_URI
-      MONGO_INITDB_URI: secrets.MONGO_INITDB_URI_LIVE
     defaults:
       run:
         working-directory: Backend/Services/Delivery Service
+    services: # <--- SERVICE CONTAINER VOOR MONGO
+      mongo:
+        image: mongo:latest # Of een specifieke versie zoals mongo:4.4, mongo:5.0
+        ports:
+          - 27017:27017 # Map de containerpoort naar de host (runner) poort
+        options: >-
+          --health-cmd "mongosh --eval 'db.runCommand({ping: 1})' --quiet"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
@@ -51,6 +57,12 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build Delivery Service JAR
+        env:
+          OAUTH2_JWT_AUDIENCES: secrets.OAUTH2_JWT_AUDIENCES
+          OAUTH2_JWT_ISSUER_URI: secrets.OAUTH2_JWT_ISSUER_URI
+          MONGO_INITDB_URI: secrets.MONGO_INITDB_URI
+          MONGO_INITDB_ROOT_PASSWORD: secrets.MONGO_INITDB_ROOT_PASSWORD
+          MONGO_INITDB_ROOT_USERNAME: secrets.MONGO_INITDB_ROOT_USERNAME
         run: ./gradlew clean build
 
   docker-login:
