@@ -1,10 +1,10 @@
 name: CI/CD Pipeline
 
-on:
-  workflow_run:
-    workflows: ["E2E Workflow"]
-    types:
-      - completed
+on: [push]
+#  workflow_run:
+#    workflows: ["E2E Workflow"]
+#    types:
+#      - completed
 
 jobs:
   setup-java:
@@ -40,7 +40,7 @@ jobs:
     env:
       OAUTH2_JWT_AUDIENCES: secrets.OAUTH2_JWT_AUDIENCES
       OAUTH2_JWT_ISSUER_URI: secrets.OAUTH2_JWT_ISSUER_URI
-      MONGO_INITDB_URI: secrets.MONGO_INITDB_URI
+      MONGO_INITDB_URI: secrets.MONGO_INITDB_URI_LIVE
     defaults:
       run:
         working-directory: Backend/Services/Delivery Service
