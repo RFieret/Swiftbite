@@ -45,6 +45,10 @@ jobs:
         image: mongo:latest # Of een specifieke versie zoals mongo:4.4, mongo:5.0
         ports:
           - 27017:27017 # Map de containerpoort naar de host (runner) poort
+        env: # <--- MONGO INIT VARIABLES STAAN HIER
+          MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }} # Gebruik correcte secret syntax
+          MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }} # Gebruik correcte secret syntax
+          MONGO_INITDB_DATABASE: deliverydb # Optioneel: stel standaard DB in
         options: >-
           --health-cmd "mongosh --eval 'db.runCommand({ping: 1})' --quiet"
           --health-interval 10s
@@ -61,8 +65,6 @@ jobs:
           OAUTH2_JWT_AUDIENCES: secrets.OAUTH2_JWT_AUDIENCES
           OAUTH2_JWT_ISSUER_URI: secrets.OAUTH2_JWT_ISSUER_URI
           MONGO_INITDB_URI: secrets.MONGO_INITDB_URI
-          MONGO_INITDB_ROOT_PASSWORD: secrets.MONGO_INITDB_ROOT_PASSWORD
-          MONGO_INITDB_ROOT_USERNAME: secrets.MONGO_INITDB_ROOT_USERNAME
         run: ./gradlew clean build
 
   docker-login:
