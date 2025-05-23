@@ -72,12 +72,15 @@ jobs:
     outputs:
       logged-in: ${{ steps.login.outcome }}
     steps:
-      - name: Docker Login
-        id: login
-        uses: docker/login-action@v2
-        with:
-          username: 494690
-          password: dckr_pat_ju576q2kjjdF5d32kzVJCdqgt-U
+    # In je push-delivery-service en push-order-service jobs, VOOR de docker build/push stap
+    - name: Docker Logout (Force)
+      run: docker logout docker.io || true # || true om te voorkomen dat de job faalt als er geen login was
+
+    - name: Docker Login (Manual)
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }} # of '494690'
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }} # Zorg dat dit het juiste, werkende PAT is
+      run: echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin docker.io
 
   calculate-version:
     runs-on: ubuntu-latest
