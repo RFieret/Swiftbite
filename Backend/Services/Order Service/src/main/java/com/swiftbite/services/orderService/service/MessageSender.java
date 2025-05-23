@@ -18,5 +18,6 @@ public class MessageSender {
 
     public void createDelivery(Order order){
         rabbitTemplate.convertAndSend("delivery.exchange","delivery.createDelivery", order);
+        System.out.println("Delivery sent");
     }
 }
