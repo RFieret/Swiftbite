@@ -128,8 +128,8 @@ jobs:
         run: |
           VERSION=${{ needs.calculate-version.outputs.new_version }} # Gebruik berekende versie
           echo "Gebruik versie $VERSION voor order-service"
-          docker build -t docker.io/494690/order-service:${VERSION} "Order Service"
-          docker push docker.io/494690/order-service:${VERSION}
+          docker build -t docker.io/i494690/order-service:${VERSION} "Order Service"
+          docker push docker.io/i494690/order-service:${VERSION}
 
   push-delivery-service:
     needs: [build-delivery-service, docker-login, calculate-version]
@@ -144,5 +144,5 @@ jobs:
         run: |
           VERSION=${{ needs.calculate-version.outputs.new_version }} # Gebruik berekende versie
           echo "Gebruik versie $VERSION voor delivery-service"
-          docker build -t docker.io/494690/test-image:${VERSION} "Delivery Service"
-          docker push docker.io/494690/test-image:${VERSION}
+          docker build -t docker.io/i494690/test-image:${VERSION} "Delivery Service"
+          docker push docker.io/i494690/test-image:${VERSION}
