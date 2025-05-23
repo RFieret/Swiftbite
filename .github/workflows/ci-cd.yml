@@ -1,10 +1,10 @@
 name: CI/CD Pipeline
 
-on: [push]
-#  workflow_run:
-#    workflows: ["E2E Workflow"]
-#    types:
-#      - completed
+on:
+  workflow_run:
+    workflows: ["E2E Workflow"]
+    types:
+      - completed
 
 jobs:
   setup-java:
@@ -144,5 +144,5 @@ jobs:
         run: |
           VERSION=${{ needs.calculate-version.outputs.new_version }} # Gebruik berekende versie
           echo "Gebruik versie $VERSION voor delivery-service"
-          docker build -t docker.io/494690/test-image:${VERSION} "Delivery Service"
-          docker push docker.io/494690/test-image:${VERSION}
+          docker build -t docker.io/494690/delivery-service:${VERSION} "Delivery Service"
+          docker push docker.io/494690/delivery-service:${VERSION}
