@@ -62,7 +62,7 @@ public class DeliveryController {
 
     @GetMapping("/getOpenDeliveries")
     public ResponseEntity<List<Delivery>> getOpenDeliveries() {
-        List<Delivery> deliveries = deliveryService.getDeliveriesByStatus("Created");
+        List<Delivery> deliveries = deliveryService.getDeliveriesByStatus("created");
         if (deliveries == null) {
             return ResponseEntity.notFound().build();
         }
