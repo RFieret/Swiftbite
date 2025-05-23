@@ -121,7 +121,7 @@ jobs:
       - name: Build & Push Order Service Image
         run: |
           VERSION=${{ needs.calculate-version.outputs.new_version }}
-          echo "Gebruik versie $VERSION voor order-service"
+          echo "Use version $VERSION for order-service"
           docker build -t docker.io/494690/order-service:${VERSION} "Order Service"
           docker push docker.io/494690/order-service:${VERSION}
 
@@ -143,6 +143,6 @@ jobs:
       - name: Build & Push Delivery Service Image
         run: |
           VERSION=${{ needs.calculate-version.outputs.new_version }}
-          echo "Gebruik versie $VERSION voor delivery-service"
+          echo "Use version $VERSION for delivery-service"
           docker build -t docker.io/494690/delivery-service:${VERSION} "Delivery Service"
           docker push docker.io/494690/delivery-service:${VERSION}
