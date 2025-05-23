@@ -67,18 +67,6 @@ jobs:
           MONGO_INITDB_URI:  ${{ secrets.MONGO_INITDB_URI }}
         run: ./gradlew clean build
 
-  docker-login:
-    runs-on: ubuntu-latest
-    outputs:
-      logged-in: ${{ steps.login.outcome }}
-    steps:
-      - name: Docker Login
-        id: login
-        uses: docker/login-action@v3
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
-
   calculate-version:
     runs-on: ubuntu-latest
     outputs:
@@ -116,23 +104,29 @@ jobs:
           echo "new_docker_version=$NEW_DOCKER_VERSION" >> $GITHUB_OUTPUT
 
   push-order-service:
-    needs: [build-order-service, docker-login, calculate-version]
+    needs: [build-order-service, calculate-version]
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: Backend/Services
     steps:
       - uses: actions/checkout@v4
+
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build & Push Order Service Image
         run: |
           VERSION=${{ needs.calculate-version.outputs.new_version }} # Gebruik berekende versie
           echo "Gebruik versie $VERSION voor order-service"
-          docker build -t docker.io/i494690/order-service:${VERSION} "Order Service"
-          docker push docker.io/i494690/order-service:${VERSION}
+          docker build -t docker.io/494690/order-service:${VERSION} "Order Service"
+          docker push docker.io/494690/order-service:${VERSION}
 
   push-delivery-service:
-    needs: [build-delivery-service, docker-login, calculate-version]
+    needs: [build-delivery-service, calculate-version]
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -140,9 +134,15 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
       - name: Build & Push Delivery Service Image
         run: |
           VERSION=${{ needs.calculate-version.outputs.new_version }} # Gebruik berekende versie
           echo "Gebruik versie $VERSION voor delivery-service"
-          docker build -t docker.io/i494690/test-image:${VERSION} "Delivery Service"
-          docker push docker.io/i494690/test-image:${VERSION}
+          docker build -t docker.io/494690/test-image:${VERSION} "Delivery Service"
+          docker push docker.io/494690/test-image:${VERSION}
