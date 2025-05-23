@@ -1,36 +1,18 @@
 package com.e2e.tests;
 
-import com.rabbitmq.client.*;
 import jakarta.json.Json;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 import org.json.JSONObject;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import org.testcontainers.containers.DockerComposeContainer;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.Network;
-import org.testcontainers.containers.RabbitMQContainer;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import org.testcontainers.utility.DockerImageName;
-
-import java.io.File;
 import java.io.StringReader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Tag;
 
 @Testcontainers
@@ -45,14 +27,7 @@ public class OrderDeliveryFlowTest {
         String clientSecret = System.getenv("AUTH0_CLIENT_SECRET");
         String audience = System.getenv("OAUTH2_JWT_AUDIENCES"); // Must match API audience in Auth0
 
-        System.out.println("Auth0 domain: " + authDomain);
-        System.out.println("Auth0 client ID: " + clientId);
-        System.out.println("Auth0 client secret: " + clientSecret);
-        System.out.println("Auth0 audience: " + audience);
-
         String tokenUrl = authDomain + "/oauth/token";
-
-        System.out.println("Token URL: " + tokenUrl);
 
         String requestBody = """
         {
@@ -75,20 +50,20 @@ public class OrderDeliveryFlowTest {
         HttpResponse<String> response;
 
         try {
-            // Your existing code to get Auth0 token
+            // Request Token
             response = client.send(tokenRequest, HttpResponse.BodyHandlers.ofString());
 
-            // Add detailed error output
+            // Detailed error output
             if (response.statusCode() != 200) {
                 System.err.println("Auth0 token request failed with status code: " + response.statusCode());
                 System.err.println("Response body: " + response.body());
+
                 // Print all response headers for debugging
                 response.headers().map().forEach((key, values) -> {
                     System.err.println(key + ": " + String.join(", ", values));
                 });
                 throw new RuntimeException("Failed to get Auth0 token: " + response.body());
             }
-            // Rest of your code
         } catch (Exception e) {
             System.err.println("Exception during Auth0 token request: " + e.getMessage());
             e.printStackTrace();
@@ -111,7 +86,7 @@ public class OrderDeliveryFlowTest {
                 .connectTimeout(Duration.ofSeconds(10))
                 .build();
 
-        // 2. Step 1: Create a delivery through Kong API Gateway -> OrderService
+        // 2. Create a delivery through Kong API Gateway -> OrderService
         String orderJson = """
                 {
                     "id": "%s",
@@ -135,15 +110,7 @@ public class OrderDeliveryFlowTest {
         // Verify the initial response
         assertEquals(200, createResponse.statusCode(), "Initial createDelivery request should be accepted");
 
-//        // Parse the delivery ID from the response
-//        JsonObject responseJson;
-//        try (JsonReader jsonReader = Json.createReader(new StringReader(createResponse.body()))) {
-//            responseJson = jsonReader.readObject();
-//        }
-//
-//        System.out.println(responseJson);
-
-        // Get created delivery from order ID
+        // 3. Get created delivery from order ID
         HttpRequest getDeliveryIDbyOrder = HttpRequest.newBuilder()
                 .uri(URI.create(kongGatewayUrl + "/deliveries/api/deliveryservice/deliveryByOrder/"+OrderID))
                 .header("Content-Type", "application/json")
@@ -162,17 +129,7 @@ public class OrderDeliveryFlowTest {
         System.out.println(responseJson);
         String DeliveryId = responseJson.getString("id");
 
-//        // 4. Step 2: Verify the delivery was created through Kong -> DeliveryService
-//        HttpRequest getDeliveryRequest = HttpRequest.newBuilder()
-//                .uri(URI.create(kongGatewayUrl + "/deliveries/api/deliveryservice/deliveryByOrder" + DeliveryId))
-//                .GET()
-//                .build();
-//
-//        HttpResponse<String> getResponse = client.send(getDeliveryRequest, HttpResponse.BodyHandlers.ofString());
-//
-//        assertEquals(200, getResponse.statusCode(), "Should be able to get delivery");
-//
-        // 5. Step 3: Assign a driver to the delivery through Kong -> DeliveryService
+        // 4. Assign a driver to the delivery through Kong -> DeliveryService
         String assignDriverJson = """
                 {
                     "deliveryId": "%s",
@@ -194,7 +151,7 @@ public class OrderDeliveryFlowTest {
 
         assertEquals(200, assignResponse.statusCode(), "Should be able to assign driver");
 
-        // 6. Step 4: Complete the delivery through Kong -> DeliveryService
+        // 5. Complete the delivery through Kong -> DeliveryService
         HttpRequest completeDeliveryRequest = HttpRequest.newBuilder()
                 .uri(URI.create(kongGatewayUrl + "/deliveries/api/deliveryservice/completeDelivery/" + DeliveryId))
                 .header("Authorization", "Bearer " + token)
@@ -204,15 +161,8 @@ public class OrderDeliveryFlowTest {
         HttpResponse<String> completeResponse = client.send(completeDeliveryRequest, HttpResponse.BodyHandlers.ofString());
 
         assertEquals(200, completeResponse.statusCode(), "Should be able to complete delivery");
-//
-//        // 7. Wait for the completion message through RabbitMQ (with timeout)
-//        boolean completionReceived = completionLatch.await(30, TimeUnit.SECONDS);
-//        assertTrue(completionReceived, "Didn't receive delivery completion message within timeout");
-//
-//        // 8. Verify the delivery was processed correctly
-//        assertEquals(initialDeliveryId, deliveryId[0], "Delivery ID should match");
-//        assertEquals("DELIVERED", orderStatus[0], "Final status should be DELIVERED");
-        // 8. Verify the delivery was processed correctly
+
+        // 6. Wait for the message to arrive and Verify the delivery was processed correctly
         Thread.sleep(5000);
 
         HttpRequest checkHandler = HttpRequest.newBuilder()
