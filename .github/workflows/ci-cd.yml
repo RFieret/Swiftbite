@@ -9,7 +9,7 @@ on:
 jobs:
   setup-java:
     runs-on: ubuntu-latest
-#    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     outputs:
       java-version: '21'
     steps:
@@ -42,13 +42,13 @@ jobs:
         working-directory: Backend/Services/Delivery Service
     services: # <--- SERVICE CONTAINER VOOR MONGO
       mongo:
-        image: mongo:latest # Of een specifieke versie zoals mongo:4.4, mongo:5.0
+        image: mongo:latest
         ports:
-          - 27017:27017 # Map de containerpoort naar de host (runner) poort
-        env: # <--- MONGO INIT VARIABLES STAAN HIER
-          MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }} # Gebruik correcte secret syntax
-          MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }} # Gebruik correcte secret syntax
-          MONGO_INITDB_DATABASE: deliverydb # Optioneel: stel standaard DB in
+          - 27017:27017
+        env: # <--- MONGO INIT VARIABLES
+          MONGO_INITDB_ROOT_USERNAME: ${{ secrets.MONGO_INITDB_ROOT_USERNAME }} 
+          MONGO_INITDB_ROOT_PASSWORD: ${{ secrets.MONGO_INITDB_ROOT_PASSWORD }} 
+          MONGO_INITDB_DATABASE: deliveries
         options: >-
           --health-cmd "mongosh --eval 'db.runCommand({ping: 1})' --quiet"
           --health-interval 10s
@@ -75,20 +75,20 @@ jobs:
       - name: Checkout code for versioning
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Nodig om alle Git tags te kunnen fetchen
+          fetch-depth: 0
 
       - name: Calculate Next Docker Version
         id: version_step
         run: |
-          set -e # Stop het script bij een fout
+          set -e # Stop script on error
           
-          # 1. Zorg dat je alle tags hebt van de remote
+          # 1. Get all tags from remote
           git fetch --tags -f
           
-          # 2. Vind de laatste semantische Git-tag (X.Y.Z formaat)
+          # 2. find the latest semantic Git-tag (X.Y.Z format)
           LATEST_GIT_TAG=$(git tag --list '[0-9]*\.[0-9]*\.[0-9]*' --sort=-v:refname | head -n 1)
           
-          # 3. Bepaal de nieuwe Docker versie
+          # 3. Decide the new version
           if [ -z "$LATEST_GIT_TAG" ]; then
             NEW_DOCKER_VERSION="1.0.0"
           else
@@ -97,10 +97,10 @@ jobs:
             NEW_DOCKER_VERSION="$MAJOR.$MINOR.$PATCH"
           fi
           
-          echo "Laatste Git-tag (als basis voor Docker versie): $LATEST_GIT_TAG"
-          echo "Nieuwe Docker versie wordt: $NEW_DOCKER_VERSION"
+          echo "Latest Git-tag: $LATEST_GIT_TAG"
+          echo "New Docker version becomes: $NEW_DOCKER_VERSION"
           
-          # Stel de nieuwe versie in als output van deze stap
+          # Set new VERSION as output
           echo "new_docker_version=$NEW_DOCKER_VERSION" >> $GITHUB_OUTPUT
 
   push-order-service:
@@ -120,7 +120,7 @@ jobs:
 
       - name: Build & Push Order Service Image
         run: |
-          VERSION=${{ needs.calculate-version.outputs.new_version }} # Gebruik berekende versie
+          VERSION=${{ needs.calculate-version.outputs.new_version }}
           echo "Gebruik versie $VERSION voor order-service"
           docker build -t docker.io/494690/order-service:${VERSION} "Order Service"
           docker push docker.io/494690/order-service:${VERSION}
@@ -142,7 +142,7 @@ jobs:
 
       - name: Build & Push Delivery Service Image
         run: |
-          VERSION=${{ needs.calculate-version.outputs.new_version }} # Gebruik berekende versie
+          VERSION=${{ needs.calculate-version.outputs.new_version }}
           echo "Gebruik versie $VERSION voor delivery-service"
           docker build -t docker.io/494690/delivery-service:${VERSION} "Delivery Service"
           docker push docker.io/494690/delivery-service:${VERSION}
